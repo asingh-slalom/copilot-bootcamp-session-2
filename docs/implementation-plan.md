@@ -9,14 +9,17 @@ This document outlines the phased approach to expand the TODO application from a
 **Completed Phases:**
 - ✅ **Phase 1: Backend API** - All CRUD endpoints, validation, error handling, and 30 integration tests passing
 - ✅ **Phase 2: Frontend UI** - All components (TodoItem, TodoList, TodoForm, TaskFilter, TaskSort), Material-UI theming, state management, and API integration
-- ✅ **Phase 3: Frontend Testing** - 72 frontend unit tests + 30 backend integration tests + E2E test suite complete
+- ✅ **Phase 3: Frontend Testing** - 11 backend unit tests + 77 frontend unit tests + 30 backend integration tests + E2E test suite complete
 - ✅ **Phase 4: Data Persistence** - localStorage persistence for offline support
 
 **Ready for Implementation:**
-- Phase 5: Polish & Performance (Ready to implement)
+- 🚀 **Phase 5: Polish & Performance** (Ready to start)
 
 **Test Suite Summary:**
-- Frontend Unit Tests: 72/72 passing ✅
+- Backend Unit Tests: 11/11 passing ✅
+  - app.test.js: 11/11 (Express app, middleware, routes, error handling)
+- Frontend Unit Tests: 77/77 passing ✅
+  - App.test.js: 5/5
   - TodoList: 10/10
   - TodoItem: 15/15
   - TodoForm: 7/7
@@ -29,6 +32,48 @@ This document outlines the phased approach to expand the TODO application from a
 - Frontend fully functional on port 3000
 - All features integrated and operational
 - Complete test coverage across all layers
+
+---
+
+## Phase 5 Implementation Checklist
+
+### 5.1 Performance Optimizations
+- [ ] Memoize TodoItem with React.memo()
+- [ ] Memoize TodoList with useMemo for filtered/sorted tasks
+- [ ] Memoize TaskFilter and TaskSort components
+- [ ] Add useCallback for event handlers in App.js
+- [ ] Implement debouncing for filter/sort operations
+- [ ] Implement API response caching
+- [ ] Build bundle and analyze with webpack-bundle-analyzer
+- [ ] Target: Lighthouse score ≥90
+
+### 5.2 Accessibility (WCAG AA)
+- [ ] Add semantic HTML tags (main, header, form, section)
+- [ ] Add aria-labels to all icon buttons
+- [ ] Add aria-describedby to form fields
+- [ ] Add aria-live regions for dynamic content
+- [ ] Test keyboard navigation (Tab, Enter, Escape, Arrows)
+- [ ] Verify 4.5:1 color contrast ratio
+- [ ] Add visible focus indicators
+- [ ] Test with screen reader
+- [ ] Add eslint-plugin-jsx-a11y linting
+
+### 5.3 Code Quality & Documentation
+- [ ] Run npm run lint and fix all warnings
+- [ ] Add JSDoc comments to all components
+- [ ] Extract magic values to constants
+- [ ] Create custom hooks (useTaskFilter, useTaskSort)
+- [ ] Run npm audit and fix vulnerabilities
+- [ ] Update README with setup instructions
+- [ ] Document API endpoints
+
+### 5.4 Testing & QA
+- [ ] Verify ≥80% frontend code coverage
+- [ ] Verify ≥85% backend code coverage
+- [ ] Test on Chrome, Firefox, Safari
+- [ ] Test on mobile viewports (iOS, Android)
+- [ ] Performance testing on 3G network
+- [ ] Cross-browser compatibility check
 
 ---
 
@@ -343,27 +388,109 @@ When ready to upgrade from in-memory storage:
 
 ### 5.1 Performance Optimizations
 
-- **Memoization**: Use `React.memo()` for TaskItem, TaskSort, TaskFilter
-- **useMemo Hooks**: Memoize filtered/sorted task lists
-- **useCallback Hooks**: Memoize event handlers passed to child components
-- **Virtual Scrolling**: For large task lists (100+ items), consider react-window
-- **Debouncing**: Debounce API calls during rapid edits (e.g., 500ms)
+**Components to Memoize** (`packages/frontend/src/components/`):
+- ✅ `TodoItem.jsx` - Memoize with `React.memo()` to prevent re-renders when props unchanged
+- ✅ `TodoList.jsx` - Use `useMemo()` for filtered/sorted task computation
+- ✅ `TaskFilter.jsx` - Memoize to avoid re-rendering on parent updates
+- ✅ `TaskSort.jsx` - Memoize to avoid re-rendering on parent updates
+- ✅ `App.js` - Use `useCallback()` for all event handlers passed to children
+
+**State Management Optimization**:
+- Move filter and sort state to custom hook (e.g., `useTaskFilter.js`, `useTaskSort.js`)
+- Implement selector pattern for Redux/Context if adding complex state
+- Profile with React DevTools to identify unnecessary re-renders
+
+**API Call Optimization**:
+- ✅ Implement debouncing on search/filter operations (500ms delay)
+- ✅ Cache API responses to avoid redundant calls
+- ✅ Implement request deduplication for concurrent identical requests
+
+**Bundle Size**:
+- Run `npm run build` and review bundle size
+- Analyze with `npx webpack-bundle-analyzer`
+- Remove unused dependencies
+- Lazy-load heavy components if needed
 
 ### 5.2 Accessibility (a11y)
 
-- **Semantic HTML**: Use proper HTML elements (button, label, form, main, etc.)
-- **ARIA Labels**: Add aria-labels to icon buttons and form inputs
-- **Keyboard Navigation**: All features accessible via Tab, Enter, Escape, Arrow keys
-- **Color Contrast**: Ensure text meets WCAG AA standards (4.5:1 ratio)
-- **Focus Indicators**: Visible focus rings on interactive elements
+**Semantic HTML** (`packages/frontend/src/components/`):
+- ✅ Use `<main>` for main content area in App.js
+- ✅ Use `<header>` for app header
+- ✅ Use `<form>` for TodoForm instead of div
+- ✅ Use `<section>` for logical content groupings
+- ✅ Ensure all buttons have descriptive text or aria-labels
+
+**ARIA Labels and Roles**:
+- ✅ Add `aria-label` to all icon-only buttons (edit, delete, complete)
+- ✅ Add `aria-describedby` for form field descriptions
+- ✅ Add `role="status"` for loading states and error messages
+- ✅ Add `aria-live="polite"` for dynamic content updates
+- ✅ Add `aria-hidden="true"` for decorative elements
+
+**Keyboard Navigation**:
+- ✅ Tab order correct - flows logically through: Add button → Filter buttons → Sort dropdown → Task list
+- ✅ Enter key submits forms
+- ✅ Escape key closes modals
+- ✅ Arrow keys navigate task list
+- ✅ All interactive elements accessible via keyboard
+
+**Color Contrast & Visual Indicators**:
+- ✅ Verify text meets WCAG AA standard (4.5:1 ratio for normal text, 3:1 for large text)
+- ✅ Visible focus ring on all interactive elements (outline, box-shadow, etc.)
+- ✅ Use color + icon/text for status (not color alone)
+- ✅ Test with color blindness simulator
+
+**Testing Accessibility**:
+- Install `eslint-plugin-jsx-a11y` for linting
+- Run accessibility audits: `npm run lint:a11y`
+- Manual testing with screen reader (NVDA, JAWS, or Voice Over)
+- Automated testing with `jest-axe` and `@axe-core/react`
 
 ### 5.3 Code Quality & Documentation
 
-- **ESLint**: Run `npm run lint` and fix all warnings
-- **Code Review**: Peer review all code before merging
-- **Comments**: Add JSDoc comments to complex functions
-- **Refactoring**: Extract reusable utilities and constants
-- **Dependencies**: Keep dependencies up to date and audit for vulnerabilities
+**ESLint Configuration**:
+- ✅ Run `npm run lint` in all packages
+- ✅ Fix all warnings and errors
+- ✅ Configure ESLint for accessibility plugin
+- ✅ Add pre-commit hook with `husky` to lint before committing
+
+**Code Documentation**:
+- ✅ Add JSDoc comments to all component prop types
+- ✅ Document complex business logic with inline comments
+- ✅ Update README.md with setup and usage instructions
+- ✅ Add comments for non-obvious decisions
+
+**Refactoring Tasks**:
+- ✅ Extract date formatting to constants
+- ✅ Extract priority/status color mappings to constants
+- ✅ Extract API endpoints to config file
+- ✅ Create custom API hook for data fetching
+
+**Dependency Audit**:
+- ✅ Run `npm audit` and fix vulnerabilities
+- ✅ Remove unused dependencies
+- ✅ Update outdated packages safely
+- ✅ Document any breaking changes
+
+### 5.4 Testing & Quality Assurance
+
+**Code Coverage Requirements**:
+- Frontend components: ≥80% coverage
+- Backend controllers: ≥85% coverage
+- Utilities/helpers: ≥95% coverage
+- E2E critical paths: All major user workflows covered
+
+**Performance Testing**:
+- ✅ Lighthouse score ≥90 (desktop)
+- ✅ Page load time <2 seconds on 3G
+- ✅ First Contentful Paint (FCP) <1.5s
+- ✅ Largest Contentful Paint (LCP) <2.5s
+
+**Cross-browser Testing**:
+- ✅ Chrome/Edge (Chromium-based)
+- ✅ Firefox
+- ✅ Safari
+- ✅ Mobile browsers (iOS Safari, Chrome Mobile)
 
 ---
 
@@ -423,8 +550,10 @@ packages/
 │   │   └── models/
 │   │       └── Task.js
 │   ├── __tests__/
+│   │   ├── unit/
+│   │   │   └── app.test.js (11 tests)
 │   │   └── integration/
-│   │       └── todos-api.test.js
+│   │       └── todos-api.test.js (30 tests)
 │   └── index.js (entry point)
 │
 ├── frontend/
@@ -440,10 +569,11 @@ packages/
 │   │   ├── styles/
 │   │   │   └── theme.js
 │   │   ├── __tests__/
-│   │   │   ├── TodoList.test.js
-│   │   │   ├── TodoItem.test.js
-│   │   │   ├── TodoForm.test.js
-│   │   │   └── helpers.test.js
+│   │   │   ├── App.test.js (5 tests)
+│   │   │   ├── TodoList.test.js (10 tests)
+│   │   │   ├── TodoItem.test.js (15 tests)
+│   │   │   ├── TodoForm.test.js (7 tests)
+│   │   │   └── helpers.test.js (40 tests)
 │   │   ├── App.js (main component)
 │   │   └── index.js (entry point)
 │   └── public/
@@ -517,15 +647,17 @@ Use this checklist to track progress:
 - [x] Implement responsive design (Material-UI responsive)
 
 ### Phase 3: Frontend Testing
-- [ ] Write TodoList unit tests
-- [ ] Write TodoItem unit tests
-- [ ] Write TodoForm unit tests
-- [ ] Write utilities tests
-- [ ] Expand integration tests
-- [ ] Set up Playwright config
-- [ ] Write E2E test page object
-- [ ] Write 8 E2E test cases
-- [ ] All tests passing ✓
+- [x] Write backend unit tests (app.test.js) ✓
+- [x] Write frontend app unit tests (App.test.js) ✓
+- [x] Write TodoList unit tests ✓
+- [x] Write TodoItem unit tests ✓
+- [x] Write TodoForm unit tests ✓
+- [x] Write utilities tests ✓
+- [x] Expand integration tests ✓
+- [x] Set up Playwright config ✓
+- [x] Write E2E test page object ✓
+- [x] Write 8 E2E test cases ✓
+- [x] All tests passing ✓
 
 ### Phase 4: Data Persistence
 - [x] Implement localStorage in frontend
