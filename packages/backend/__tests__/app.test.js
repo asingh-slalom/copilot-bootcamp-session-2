@@ -1,6 +1,6 @@
 const request = require('supertest');
-const app = require('../../src/app');
-const TaskModel = require('../../src/models/Task');
+const app = require('../src/app');
+const TaskModel = require('../src/models/Task');
 
 describe('Express App Initialization', () => {
   beforeEach(() => {
